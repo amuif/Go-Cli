@@ -1,8 +1,10 @@
 package main
 
-import "fmt"
 
 func main() {
-	fmt.Print("Hello world")
+	todos :=Todos{} 
+	todos.add("Buy")
+	todos.add("sell")
+  todos.print()
 
-}
+  }
