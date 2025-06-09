@@ -28,9 +28,30 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	// Check if msg is a keypress to quit
 	var cmd tea.Cmd
+	var quitCmd tea.Cmd
+
+	var quitModel tea.Model
+	quitModel, quitCmd = m.Quit(msg)
+	m = quitModel.(model)
+	if quitCmd != nil {
+		return m, quitCmd
+	}
+
 	m.table, cmd = m.table.Update(msg)
 	return m, cmd
+}
+
+func (m model) Quit(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "ctrl+c", "q":
+			return m, tea.Quit
+		}
+	}
+	return m, nil
 }
 
 func (m model) View() string {
@@ -121,7 +142,17 @@ func (todos Todos) print() {
 		table.WithFocused(true),
 		table.WithHeight(20),
 	)
-	t.SetStyles(table.DefaultStyles())
+	// Add a visible border style
+	styles := table.DefaultStyles()
+	styles.Header = styles.Header.
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("240")).
+		BorderBottom(true)
+	styles.Selected = styles.Selected.
+		Foreground(lipgloss.Color("229")).
+		Background(lipgloss.Color("57")).
+		Bold(true)
+	t.SetStyles(styles)
 
 	m := model{table: t}
 
@@ -130,19 +161,3 @@ func (todos Todos) print() {
 		os.Exit(1)
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
