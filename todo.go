@@ -142,6 +142,7 @@ func (todos Todos) print() {
 		table.WithFocused(true),
 		table.WithHeight(20),
 	)
+
 	// Add a visible border style
 	styles := table.DefaultStyles()
 	styles.Header = styles.Header.
@@ -149,8 +150,8 @@ func (todos Todos) print() {
 		BorderForeground(lipgloss.Color("240")).
 		BorderBottom(true)
 	styles.Selected = styles.Selected.
-		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("57")).
+		Foreground(lipgloss.Color("#f8f8f2")).
+		Background(lipgloss.Color("#282a36")).
 		Bold(true)
 	t.SetStyles(styles)
 
