@@ -33,7 +33,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var quitCmd tea.Cmd
 
 	var quitModel tea.Model
-	quitModel, quitCmd = m.Quit(msg)
+	quitModel, quitCmd = m.quit(msg)
 	m = quitModel.(model)
 	if quitCmd != nil {
 		return m, quitCmd
@@ -43,7 +43,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m model) Quit(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) quit(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -140,7 +140,7 @@ func (todos Todos) print() {
 		table.WithColumns(columns),
 		table.WithRows(rows),
 		table.WithFocused(true),
-		table.WithHeight(20),
+		table.WithHeight(10),
 	)
 
 	// Add a visible border style

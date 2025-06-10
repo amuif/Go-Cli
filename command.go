@@ -14,18 +14,20 @@ type cmdFlags struct {
 	Edit   string
 	Toggle int 
 	List   bool
+  Quit   string
 }
 
 func NewCmdFlags() *cmdFlags {
 	cf := cmdFlags{}
 	flag.StringVar(&cf.Add, "add", "", "Add a new todo specify title")
   	flag.StringVar(&cf.Edit, "Edit", "", "Edit todo")
-      	flag.IntVar(&cf.Del, "del", -1, "Delete todo")
-      	flag.IntVar(&cf.Toggle, "toggle", -1, "Toggle todo")
-      	flag.BoolVar(&cf.List, "list", false, "List todos")
-        flag.Parse()
+    flag.IntVar(&cf.Del, "del", -1, "Delete todo")
+    flag.IntVar(&cf.Toggle, "toggle", -1, "Toggle todo")
+    flag.BoolVar(&cf.List, "list", false, "List todos")
+    flag.StringVar(&cf.Quit, "quit", "", "Quit todos")
+    flag.Parse()
   
-        return &cf 
+return &cf 
 }
 
 func (cf *cmdFlags) execute(todos *Todos){
@@ -35,6 +37,8 @@ func (cf *cmdFlags) execute(todos *Todos){
 
   case cf.Add != "":
     todos.add(cf.Add)
+    todos.print()
+    
 case cf.Edit != "":
   parts := strings.SplitN(cf.Edit, ":", 2)
   if len(parts) != 2{
@@ -49,9 +53,13 @@ case cf.Edit != "":
   todos.edit(index, parts[1] )
   case cf.Toggle != -1: 
   todos.toggle(cf.Toggle)
+  todos.print()
 
 case cf.Del != -1:
   todos.delete(cf.Del)
+  todos.print()
+case cf.Quit != "":
+
 default:
   fmt.Println("Invalid Command")
 }
