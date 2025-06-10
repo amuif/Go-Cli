@@ -3,8 +3,10 @@ package main
 
 func main() {
 	todos :=Todos{} 
-	todos.add("Buy")
-	todos.add("sell")
+  storage := NewStorage[Todos]("todos.json")
+  storage.Load(&todos)
   todos.print()
-
+  cmdFlags := NewCmdFlags()
+  cmdFlags.execute(&todos)
+  storage.Save(todos)
   }
