@@ -20,8 +20,53 @@ type Todo struct {
 type Todos []Todo
 
 type model struct {
+  cursor int
 	table table.Model
+  selected map[int]struct{}
+  showPopup bool
+  popupText string
 }
+
+
+func initialModel() model {
+	todos := Todos{
+		{Title: "Learn Bubble Tea", Completed: false, CreatedAt: time.Now()},
+	}
+
+	columns := []table.Column{
+		{Title: "Title", Width: 30},
+		{Title: "Completed", Width: 10},
+		{Title: "Created At", Width: 20},
+		{Title: "Completed At", Width: 20},
+	}
+
+	rows := todos.toTableRows()
+
+	t := table.New(
+		table.WithColumns(columns),
+		table.WithRows(rows),
+		table.WithFocused(true),
+		table.WithHeight(10),
+	)
+
+	styles := table.DefaultStyles()
+	styles.Header = styles.Header.
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("240")).
+		BorderBottom(true)
+	styles.Selected = styles.Selected.
+		Foreground(lipgloss.Color("#f8f8f2")).
+		Background(lipgloss.Color("#282a36")).
+		Bold(true)
+
+	t.SetStyles(styles)
+
+	return model{
+		selected: make(map[int]struct{}),
+		table:    t,
+	}
+}
+
 
 func (m model) Init() tea.Cmd {
 	return nil
@@ -38,6 +83,31 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if quitCmd != nil {
 		return m, quitCmd
 	}
+  switch msg := msg.(type){
+  case tea.KeyMsg:
+    switch msg.String(){
+   
+    case "E", "e":
+      m.showPopup = true 
+      m.popupText = "Enter the new name of todo"
+      return m, nil 
+    case "A","a":
+      m.showPopup = true 
+      m.popupText = "Add a new todo"
+      return m,nil
+
+    case "D","d":
+      m.showPopup = true 
+      m.popupText= "Are you sure you want to delete?"
+      return m,nil
+    case "T","t":
+      return m,nil
+    case "esc":
+      m.showPopup= false
+      m.popupText = ""
+      return m,nil
+  }
+  }
 
 	m.table, cmd = m.table.Update(msg)
 	return m, cmd
@@ -54,10 +124,39 @@ func (m model) quit(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+
+
 func (m model) View() string {
-	style := lipgloss.NewStyle().Margin(1, 2)
-	return style.Render(m.table.View())
+	tableView := m.table.View()
+	footer := "\n\nPress E to edit , A to add , D to delete , T to toggle"
+
+	baseStyle := lipgloss.NewStyle().Margin(1, 2)
+
+	if m.showPopup {
+		popup := fmt.Sprintf(" %s\n(Press Esc to close)", m.popupText)
+
+		popupBox := lipgloss.NewStyle().
+			Border(lipgloss.RoundedBorder()).
+			Padding(1, 2).
+			Align(lipgloss.Center).
+			Width(50).
+			Foreground(lipgloss.Color("229")).
+			Background(lipgloss.Color("238")).
+			Render(popup)
+
+		overlay := lipgloss.Place(
+			80, 15, 
+			lipgloss.Center, lipgloss.Center,
+			popupBox,
+		)
+
+		return baseStyle.Render(tableView + "\n" + overlay + footer)
+	}
+
+	return baseStyle.Render(tableView + footer)
 }
+
+
 
 func (todos *Todos) add(title string) {
 	todo := Todo{
@@ -161,4 +260,5 @@ func (todos Todos) print() {
 		fmt.Println("Error running TUI:", err)
 		os.Exit(1)
 	}
+
 }
