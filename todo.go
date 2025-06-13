@@ -20,13 +20,12 @@ type Todo struct {
 type Todos []Todo
 
 type model struct {
-  cursor int
-	table table.Model
-  selected map[int]struct{}
-  showPopup bool
-  popupText string
+	cursor    int
+	table     table.Model
+	selected  map[int]struct{}
+	showPopup bool
+	popupText string
 }
-
 
 func initialModel() model {
 	todos := Todos{
@@ -67,7 +66,6 @@ func initialModel() model {
 	}
 }
 
-
 func (m model) Init() tea.Cmd {
 	return nil
 }
@@ -83,31 +81,31 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if quitCmd != nil {
 		return m, quitCmd
 	}
-  switch msg := msg.(type){
-  case tea.KeyMsg:
-    switch msg.String(){
-   
-    case "E", "e":
-      m.showPopup = true 
-      m.popupText = "Enter the new name of todo"
-      return m, nil 
-    case "A","a":
-      m.showPopup = true 
-      m.popupText = "Add a new todo"
-      return m,nil
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
 
-    case "D","d":
-      m.showPopup = true 
-      m.popupText= "Are you sure you want to delete?"
-      return m,nil
-    case "T","t":
-      return m,nil
-    case "esc":
-      m.showPopup= false
-      m.popupText = ""
-      return m,nil
-  }
-  }
+		case "E", "e":
+			m.showPopup = true
+			m.popupText = "Enter the new name of todo"
+			return m, nil
+		case "A", "a":
+			m.showPopup = true
+			m.popupText = "Add a new todo"
+			return m, nil
+
+		case "D", "d":
+			m.showPopup = true
+			m.popupText = "Are you sure you want to delete?"
+			return m, nil
+		case "T", "t":
+			return m, nil
+		case "esc":
+			m.showPopup = false
+			m.popupText = ""
+			return m, nil
+		}
+	}
 
 	m.table, cmd = m.table.Update(msg)
 	return m, cmd
@@ -123,8 +121,6 @@ func (m model) quit(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 	return m, nil
 }
-
-
 
 func (m model) View() string {
 	tableView := m.table.View()
@@ -145,7 +141,7 @@ func (m model) View() string {
 			Render(popup)
 
 		overlay := lipgloss.Place(
-			80, 15, 
+			80, 15,
 			lipgloss.Center, lipgloss.Center,
 			popupBox,
 		)
@@ -155,8 +151,6 @@ func (m model) View() string {
 
 	return baseStyle.Render(tableView + footer)
 }
-
-
 
 func (todos *Todos) add(title string) {
 	todo := Todo{
